@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Co-founder Equity Calculator</title>
+</head>
+<body>
+    <h1>Co-founder Equity Calculator</h1>
+    <form id="equityForm">
+        <label for="numCofounders">Number of Co-founders:</label>
+        <input type="number" id="numCofounders" name="numCofounders" min="1" required><br><br>
+
+        <div id="cofounderCriteria"></div>
+
+        <input type="button" value="Calculate Equity" onclick="calculateEquity()">
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('numCofounders').addEventListener('change', function() {
+    var numCofounders = parseInt(this.value);
+    var cofounderCriteriaDiv = document.getElementById('cofounderCriteria');
+    cofounderCriteriaDiv.innerHTML = '';
+
+    for (var i = 0; i < numCofounders; i++) {
+        cofounderCriteriaDiv.innerHTML += `
+            <h3>Co-founder ${i + 1}</h3>
+            <input type="checkbox" id="capital${i}" name="capital${i}"> Deployed Capital<br>
+            <input type="checkbox" id="idea${i}" name="idea${i}"> Owner of the Idea<br>
+            <input type="checkbox" id="exit${i}" name="exit${i}"> Previous Entrepreneur with Successful Exit<br>
+            <input type="checkbox" id="ivy${i}" name="ivy${i}"> Ivy League Graduate<br>
+            <input type="checkbox" id="bigco${i}" name="bigco${i}"> BigCo VP+ Experience<br><br>
+        `;
+    }
+});
+
+function calculateEquity() {
+    var numCofounders = parseInt(document.getElementById('numCofounders').value);
+    var baseEquity = 100 / numCofounders;
+    var equity = new Array(numCofounders).fill(baseEquity);
+    var bonusPerQuality = 20; // Adjust this value as needed
+
+    for (var i = 0; i < numCofounders; i++) {
+        if (document.getElementById(`capital${i}`).checked) equity[i] += bonusPerQuality * 4;
+        if (document.getElementById(`idea${i}`).checked) equity[i] += bonusPerQuality * 2;
+        if (document.getElementById(`exit${i}`).checked) equity[i] += bonusPerQuality * 2;
+        if (document.getElementById(`ivy${i}`).checked) equity[i] += bonusPerQuality;
+        if (document.getElementById(`bigco${i}`).checked) equity[i] += bonusPerQuality;
+    }
+
+    var totalEquity = equity.reduce((a, b) => a + b, 0);
+    equity = equity.map(e => (e / totalEquity) * 100);
+
+    var resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '<h2>Equity Distribution</h2>';
+    var t = 0;
+    equity.forEach((e, index) => {
+        resultsDiv.innerHTML += `Co-founder ${index + 1}: ${e.toFixed(2)}%<br>`;
+        t+=parseFloat(e);
+    });
+    t = parseInt(t);
+    resultsDiv.innerHTML +=  `Total: ${t}`;
+}
+
+</script>
+</body>
+</html>
